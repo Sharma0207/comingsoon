@@ -1,0 +1,13 @@
+@keyframes strike {
+    0% {
+        width: 0;
+    }
+
+    100% {
+        width: 100%;
+    }
+}
+
+.animate-strike {
+    animation: strike 1.5s forwards;
+}
