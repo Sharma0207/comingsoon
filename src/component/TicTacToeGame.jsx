@@ -49,7 +49,7 @@ const TicTacToe = () => {
     const newBoard = [...board];
     newBoard[randomIndex] = "O";
     setBoard(newBoard);
-    setIsXNext(true);
+    setIsXNext(true); //fjfhf
   };
 
   const handleRestart = () => {
