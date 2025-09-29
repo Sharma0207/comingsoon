@@ -191,9 +191,10 @@ const StatsSection = () => {
             Projects To Impact
           </h2>
           <p className="mt-6 text-sm sm:text-base md:text-lg text-white/90 leading-relaxed">
-            We create the most stunning graphic designs for your social media,
-            websites, branding, or literally anything. They are just
-            mindblowing.
+            We design websites that are not just visuals—they’re experiences.,
+            <br />
+            Every detail is crafted to inspire, engage, and make your brand
+            unforgettable.
           </p>
         </div>
 
@@ -318,11 +319,11 @@ const StatsSection = () => {
               </h3>
 
               <p className="mt-6 text-sm sm:text-base md:text-lg text-white/90 leading-relaxed">
-                We are a UI UX design agency, Data-driven digital product design
-                &amp; technology firm that transforms business. Flexirl focuses
-                on human-centered UI/UX Design, UX Research, Web and mobile app
-                development — offering end-to-end services that your users will
-                love.
+                We are a digital agency,crafting Data-driven digital product
+                design &amp; technology firm that transforms business. Flexirl
+                focuses on human-centered UI/UX Design, UX Research, Web and
+                mobile app development — offering end-to-end services that your
+                users will love.
               </p>
             </div>
 

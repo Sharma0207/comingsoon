@@ -70,7 +70,7 @@ const ScrollText = () => {
   return (
     <section
       ref={containerRef}
-      className="relative pb-6 md:pb-8 lg:pb-10 px-4 sm:px-8 overflow-hidden -mt-[65vh] md:-mt-[77vh] lg:-mt-[68vh] xs:-mt-[70vh]"
+      className="relative pb-6 md:pb-8 lg:pb-10 px-4 sm:px-8 overflow-hidden -mt-[55vh] md:-mt-[77vh] lg:-mt-[68vh]  sm:-mt-[70vh] xs:-mt-[50vh"
     >
       <style>
         {`
