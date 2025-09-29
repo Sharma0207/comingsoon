@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Animated ring around specific text (desktop) */
+@keyframes draw-ring { to { stroke-dashoffset: 0; } }
+.imaginative-ring { position: relative; display: inline-block; }
+.imaginative-ring > .ring-svg { position: absolute; inset: -0.35em -0.6em; width: calc(100% + 1.2em); height: calc(100% + 0.9em); pointer-events: none; }
+.imaginative-ring > .ring-svg ellipse { fill: none; stroke: #ef4b6e; stroke-width: 3px; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; }
+
+/* Trigger ring draw when section gets in-view class */
+.in-view .imaginative-ring > .ring-svg ellipse { animation: draw-ring 0.9s ease-out 0.12s forwards; }
+
+/* Simple scroll reveal */
+.reveal-up { opacity: 0; transform: translateY(24px); transition: transform .6s cubic-bezier(0.22,0.61,0.36,1), opacity .6s ease; will-change: transform, opacity; }
+.in-view .reveal-up { opacity: 1; transform: translateY(0); }
+.reveal-up.delay-1 { transition-delay: .12s; }
+.reveal-up.delay-2 { transition-delay: .2s; }
+
+@layer base {
+
+/* Ribbon marquee animation */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.ribbon-container { overflow: hidden; }
+.ribbon-track { display: flex; gap: 30px; align-items: center; animation: marquee var(--marquee-duration, 22s) linear infinite; }
+.ribbon-track:hover { animation-play-state: paused; }
+
+/* Responsive speeds */
+@media (max-width: 768px) {
+  :root { --marquee-duration: 18s; }
+}
+@media (min-width: 769px) {
+  :root { --marquee-duration: 28s; }
+}
+
+    :root {
+        /* Primary Text Colors */
+        --text-primary: #000000;
+        --text-secondary: #00000082;
+        --text-muted: #000000a5;
+        --text-dark: #0d0d0d;
+        --text-accent: #183942;
+        --text-accent-light: #183942c4;
+        --text-gray: #1e1e1e;
+        --text-green: #1f392c;
+        --text-blue: #439be9;
+        --text-brown: #4b4f47;
+        --text-light-gray: #8b8b8b;
+        --text-medium-gray: #939393;
+        --text-light-blue: #b1eeff;
+        --text-pale-gray: #b5b5c0;
+        --text-white: #ffffff;
+
+        /* Background Colors */
+        --bg-black: #000000;
+        --bg-primary: #183942;
+        --bg-dark-blue: #1c2042;
+        --bg-light-cyan: #bff1ff;
+        --bg-pale-cyan: #d8f6ff;
+        --bg-light-gray: #e2e2e2;
+        --bg-accent-pink: #ef4b6e;
+        --bg-accent-pink-transparent: #ef4b6ed6;
+        --bg-light: #efefef;
+        --bg-main: #f8f8f8;
+        --bg-cream: #f9f5f2;
+        --bg-pink-light: #ffced9;
+        --bg-yellow: #ffe496;
+        --bg-white: #ffffff;
+        --bg-white-transparent: #ffffff23;
+        --bg-white-semi: #ffffff7c;
+
+        /* Border Colors */
+        --border-primary: #000000;
+        --border-secondary: #acacac;
+
+        /* Typography Variables */
+        --font-size-xs: 10px;
+        --font-size-sm: 12px;
+        --font-size-base: 13px;
+        --font-size-md: 14px;
+        --font-size-lg: 16px;
+        --font-size-xl: 18px;
+        --font-size-2xl: 20px;
+        --font-size-3xl: 24px;
+        --font-size-4xl: 28px;
+        --font-size-5xl: 38px;
+        --font-size-6xl: 57px;
+        --font-size-7xl: 69px;
+        --font-size-8xl: 80px;
+        --font-size-hero: 133px;
+
+        /* Font Weight Variables */
+        --font-weight-light: 200;
+        --font-weight-normal: 300;
+        --font-weight-regular: 400;
+        --font-weight-medium: 500;
+        --font-weight-semibold: 600;
+        --font-weight-bold: 700;
+        --font-weight-extrabold: 800;
+        --font-weight-black: 900;
+
+        /* Line Height Variables */
+        --line-height-xs: 12px;
+        --line-height-sm: 15px;
+        --line-height-base: 17px;
+        --line-height-md: 21px;
+        --line-height-lg: 24px;
+        --line-height-xl: 30px;
+        --line-height-2xl: 46px;
+        --line-height-3xl: 83px;
+        --line-height-hero: 161px;
+
+        /* Letter Spacing Variables */
+        --letter-spacing-tight: 1px;
+        --letter-spacing-normal: 2px;
+        --letter-spacing-wide: 3px;
+        --letter-spacing-wider: 6px;
+
+        /* Spacing Variables */
+        --spacing-xs: 4px;
+        --spacing-sm: 8px;
+        --spacing-md: 12px;
+        --spacing-lg: 16px;
+        --spacing-xl: 20px;
+        --spacing-2xl: 24px;
+        --spacing-3xl: 32px;
+        --spacing-4xl: 48px;
+        --spacing-5xl: 64px;
+        --spacing-6xl: 96px;
+        --spacing-7xl: 100px;
+
+        /* Border Radius Variables */
+        --radius-xs: 1px;
+        --radius-sm: 10px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --radius-xl: 22px;
+        --radius-2xl: 36px;
+        --radius-full: 120px;
+
+        /* Component-specific Colors */
+        --button-text-primary: #000000;
+        --button-text-secondary: #ffffff;
+        --button-border: #000000;
+
+        --line-bg-primary: #000000;
+        --line-bg-secondary: #ffffff23;
+        --line-bg-tertiary: #ffffff7c;
+
+        --link-text: #000000;
+        --expandable-text: #000000;
+    }
+}
