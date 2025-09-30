@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import a from "/images/a.jpg";
-import b from "/images/ab.png";
 import d from "/images/abc.png";
 import e from "/images/abcd.png";
 import f from "/images/abcdef.png";
 import g from "/images/pro1.jpg";
 import h from "/images/proj2.jpg";
+import b from "/images/proj3.jpg";
 
 const StatsSection = () => {
   const sectionRef = useRef(null);
@@ -31,7 +31,7 @@ const StatsSection = () => {
   const rafRef = useRef(null);
 
   // Project images
-  const projectImages = [d, h, a, g, f, e, b, d, h, a, f, d];
+  const projectImages = [a, b, d, e, f, g, h];
 
   // Check if mobile on mount and resize
   useEffect(() => {
