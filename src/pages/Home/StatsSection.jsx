@@ -7,6 +7,7 @@ import e from "/images/abcd.png";
 import f from "/images/abcdef.png";
 import g from "/images/pro1.jpg";
 import h from "/images/proj2.jpg";
+
 const StatsSection = () => {
   const sectionRef = useRef(null);
   const startedRef = useRef(false);
@@ -30,7 +31,7 @@ const StatsSection = () => {
   const rafRef = useRef(null);
 
   // Project images
-  const projectImages = [d, h, a, g, f, e, b, d, h, a, f, d, h, g, e, a, d, h]; // Your project images with duplicates
+  const projectImages = [d, h, a, g, f, e, b, d, h, a, f, d];
 
   // Check if mobile on mount and resize
   useEffect(() => {
@@ -191,7 +192,7 @@ const StatsSection = () => {
             Projects To Impact
           </h2>
           <p className="mt-6 text-sm sm:text-base md:text-lg text-white/90 leading-relaxed">
-            We design websites that are not just visuals—they’re experiences.,
+            We design websites that are not just visuals—they're experiences.,
             <br />
             Every detail is crafted to inspire, engage, and make your brand
             unforgettable.
@@ -203,17 +204,14 @@ const StatsSection = () => {
           <div
             className="relative"
             style={{
-              perspective: isMobile ? "350px" : "2000px",
-              width: isMobile ? "100%" : "min(900px, 100vw)",
-              height: isMobile ? "auto" : "min(450px, 60vh)",
+              perspective: isMobile ? "350px" : "2500px",
+              width: isMobile ? "100%" : "min(1000px, 95vw)",
+              height: isMobile ? "auto" : "min(600px, 65vh)",
               aspectRatio: isMobile ? "16 / 9" : undefined,
-              WebkitMaskImage: isMobile
-                ? "none"
-                : "linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 8%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 85%, rgba(0,0,0,0.7) 92%, rgba(0,0,0,0) 100%)",
-              maskImage: isMobile
-                ? "none"
-                : "linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 8%, rgba(0,0,0,1) 15%, rgba(0,0,0,1) 85%, rgba(0,0,0,0.7) 92%, rgba(0,0,0,0) 100%)",
+              WebkitMaskImage: "none",
+              maskImage: "none",
               overflow: "visible",
+              paddingBottom: isMobile ? undefined : "1.5rem",
             }}
           >
             <div
@@ -227,20 +225,20 @@ const StatsSection = () => {
             >
               {projectImages.map((image, index) => {
                 // Mobile configuration - much wider spacing to show one full image
-                const angleStep = isMobile ? 90 : 45; // 90 degrees = only show one image at a time on mobile
+                const angleStep = isMobile ? 90 : 60;
                 const angle = index * -angleStep;
-                const z = isMobile ? -200 : -700; // Much closer to camera on mobile
-                const originZ = isMobile ? 100 : 350; // Adjusted transform origin
-                const scale = isMobile ? 0.95 : 0.92; // Slightly larger on mobile
+                const z = isMobile ? -200 : -1000;
+                const originZ = isMobile ? 100 : 450;
+                const scale = isMobile ? 0.95 : 0.8;
 
                 // Mobile: Match container and keep rectangle
-                const mobileWidth = isMobile ? "100%" : "100%";
-                const mobileHeight = isMobile ? "100%" : "100%";
+                const mobileWidth = "100%";
+                const mobileHeight = "100%";
 
                 return (
                   <div
                     key={index}
-                    className={`absolute transition-opacity duration-300 ease-out rounded-xl shadow-2xl ${
+                    className={`absolute transition-opacity duration-300 ease-out ${
                       hoveredIndex !== null
                         ? hoveredIndex === index
                           ? "opacity-100"
@@ -255,9 +253,9 @@ const StatsSection = () => {
                       width: mobileWidth,
                       height: mobileHeight,
                       inset: "0",
-                      backgroundColor: isMobile ? "transparent" : "transparent",
-                      border: undefined,
-                      padding: "0px",
+                      backgroundColor: "transparent",
+                      border: "none",
+                      padding: "0",
                       boxShadow: isMobile
                         ? "0 8px 24px rgba(0,0,0,0.25)"
                         : undefined,
@@ -289,16 +287,67 @@ const StatsSection = () => {
                       </div>
                     ) : (
                       <div
-                        className="w-full h-full rounded-lg"
-                        style={{
-                          backgroundImage: `url(${image})`,
-                          backgroundSize: "cover",
-                          backgroundPosition: "center",
-                          backgroundRepeat: "no-repeat",
-                          width: "100%",
-                          height: "100%",
-                        }}
-                      />
+                        className="relative min-w-[1020px] h-full flex items-center justify-center py-8"
+                        style={{ background: "transparent" }}
+                      >
+                        {/* iMac Frame - Larger and more prominent */}
+                        <div className="relative w-full max-w-[650px] mx-auto scale-110">
+                          {/* Screen */}
+                          <div className="relative bg-[#2a2a2a] rounded-t-3xl border-[10px] border-[#2a2a2a] shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
+                            {/* Top bezel light reflection */}
+                            <div className="absolute top-1 left-1/4 right-1/4 h-[2px] bg-gradient-to-r from-transparent via-white/15 to-transparent rounded-full blur-sm" />
+
+                            {/* macOS Traffic Lights */}
+                            <div className="absolute top-3 left-4 flex gap-2 z-10">
+                              <span className="w-3 h-3 rounded-full bg-[#ff5f56] shadow-sm" />
+                              <span className="w-3 h-3 rounded-full bg-[#ffbd2e] shadow-sm" />
+                              <span className="w-3 h-3 rounded-full bg-[#27c93f] shadow-sm" />
+                            </div>
+
+                            {/* Screen content - Full image display with contain */}
+                            <div className="relative aspect-[16/10] bg-white overflow-hidden rounded-t-xl">
+                              <img
+                                src={image}
+                                alt="Project preview"
+                                className="w-full h-full object-contain"
+                                draggable="false"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Bottom chin - thinner and sleeker */}
+                          <div className="relative h-10 bg-gradient-to-b from-[#e5e5e5] via-[#d8d8d8] to-[#c5c5c5] rounded-b-2xl flex items-center justify-center shadow-lg">
+                            {/* Apple logo */}
+                            <div className="w-4 h-4 flex items-center justify-center">
+                              <svg
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                className="w-3.5 h-3.5 text-black/30"
+                              >
+                                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                              </svg>
+                            </div>
+                          </div>
+
+                          {/* Stand - more elegant */}
+                          <div className="relative flex flex-col items-center">
+                            {/* Stand neck */}
+                            <div
+                              className="w-14 h-12 bg-gradient-to-b from-[#d5d5d5] to-[#c0c0c0] shadow-md"
+                              style={{
+                                clipPath:
+                                  "polygon(40% 0%, 60% 0%, 70% 100%, 30% 100%)",
+                              }}
+                            />
+
+                            {/* Stand base */}
+                            <div className="w-36 h-2.5 bg-gradient-to-b from-[#e8e8e8] to-[#d0d0d0] rounded-full shadow-lg -mt-0.5" />
+
+                            {/* Shadow */}
+                            <div className="w-44 h-1.5 bg-black/8 blur-sm rounded-full mt-0.5" />
+                          </div>
+                        </div>
+                      </div>
                     )}
                   </div>
                 );
