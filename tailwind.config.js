@@ -63,13 +63,13 @@ module.exports = {
       },
       keyframes: {
         blink: {
-          '0%': { transform: 'scaleY(1)' },
-          '50%': { transform: 'scaleY(0.1)' },
-          '100%': { transform: 'scaleY(1)' },
+          "0%": { transform: "scaleY(1)" },
+          "50%": { transform: "scaleY(0.1)" },
+          "100%": { transform: "scaleY(1)" },
         },
       },
       animation: {
-        blink: 'blink 0.25s ease-in-out 1',
+        blink: "blink 0.25s ease-in-out 1",
       },
       fontSize: {
         xs: "var(--font-size-xs)",

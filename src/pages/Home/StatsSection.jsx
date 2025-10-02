@@ -428,7 +428,7 @@
 // };
 
 // export default StatsSection;
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import a from "/images/a.jpg";
 import d from "/images/abc.png";
@@ -443,36 +443,133 @@ const StatsSection = () => {
   const startedRef = useRef(false);
   const rafIdsRef = useRef([]);
   const lastInteractionRef = useRef(Date.now());
+  const rotationTargetRef = useRef(0);
+  const velocityRef = useRef(0);
+  const rafRef = useRef(null);
 
   const [clientsCount, setClientsCount] = useState(0);
   const [reviewsCount, setReviewsCount] = useState(0);
   const [ratingValue, setRatingValue] = useState(0);
   const [usersCount, setUsersCount] = useState(0);
 
-  // Bay Window Carousel State
   const [isDragging, setIsDragging] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [dragStart, setDragStart] = useState(0);
   const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const [viewportWidth, setViewportWidth] = useState(() =>
+    typeof window === "undefined" ? 1440 : window.innerWidth
+  );
 
-  const rotationTargetRef = useRef(0);
-  const velocityRef = useRef(0);
-  const rafRef = useRef(null);
+  const projectImages = useMemo(() => [a, b, d, e, f, g, h], []);
 
-  // Project images
-  const projectImages = [a, b, d, e, f, g, h];
-
-  // Check if mobile on mount and resize
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
+    if (typeof window === "undefined") return undefined;
 
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    const updateViewport = () => setViewportWidth(window.innerWidth);
+
+    updateViewport();
+    window.addEventListener("resize", updateViewport);
+
+    return () => {
+      window.removeEventListener("resize", updateViewport);
+    };
   }, []);
+
+  const isMobile = viewportWidth <= 640;
+  const isTablet = viewportWidth > 640 && viewportWidth <= 1024;
+
+  const deviceConfig = useMemo(() => {
+    if (isMobile) {
+      return {
+        dragMultiplier: 0.8,
+        autoRotateStep: 0.25,
+        velocityDamping: 0.92,
+        rotationSmoothing: 0.22,
+        angleStep: 90,
+        translateZ: -200,
+        originZ: 100,
+        cardScale: 0.95,
+        minWidth: "100%",
+        carousel: {
+          perspective: "380px",
+          width: "100%",
+          height: "auto",
+          aspectRatio: "16 / 9",
+          paddingBottom: undefined,
+        },
+        frame: {
+          maxWidth: "100%",
+          scale: 0.82,
+        },
+        cardShadow: "none",
+      };
+    }
+
+    if (isTablet) {
+      return {
+        dragMultiplier: 0.5,
+        autoRotateStep: 0.16,
+        velocityDamping: 0.9,
+        rotationSmoothing: 0.18,
+        angleStep: 72,
+        translateZ: -820,
+        originZ: 360,
+        cardScale: 0.88,
+        minWidth: "min(780px, 90vw)",
+        carousel: {
+          perspective: "1700px",
+          width: "min(840px, 92vw)",
+          height: "min(520px, 62vh)",
+          aspectRatio: undefined,
+          paddingBottom: "1.25rem",
+        },
+        frame: {
+          maxWidth: "540px",
+          scale: 0.94,
+        },
+        cardShadow: "none",
+      };
+    }
+
+    return {
+      dragMultiplier: 0.35,
+      autoRotateStep: 0.1,
+      velocityDamping: 0.88,
+      rotationSmoothing: 0.15,
+      angleStep: 60,
+      translateZ: -1000,
+      originZ: 450,
+      cardScale: 0.8,
+      minWidth: "min(1020px, 85vw)",
+      carousel: {
+        perspective: "2500px",
+        width: "min(1080px, 90vw)",
+        height: "min(620px, 65vh)",
+        aspectRatio: undefined,
+        paddingBottom: "1.5rem",
+      },
+      frame: {
+        maxWidth: "650px",
+        scale: 1.08,
+      },
+      cardShadow: "none",
+    };
+  }, [isMobile, isTablet]);
+
+  const {
+    dragMultiplier,
+    autoRotateStep,
+    velocityDamping,
+    rotationSmoothing,
+    angleStep,
+    translateZ,
+    originZ,
+    cardScale,
+    minWidth,
+    carousel,
+    frame,
+    cardShadow,
+  } = deviceConfig;
 
   const handleMouseDown = (e) => {
     e.preventDefault();
@@ -486,7 +583,7 @@ const StatsSection = () => {
     if (!isDragging) return;
 
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const deltaX = (clientX - dragStart) * (isMobile ? 0.8 : 0.35);
+    const deltaX = (clientX - dragStart) * dragMultiplier;
     rotationTargetRef.current -= deltaX;
     velocityRef.current = -deltaX;
     setDragStart(clientX);
@@ -499,10 +596,9 @@ const StatsSection = () => {
     lastInteractionRef.current = Date.now();
   };
 
-  // Counter animation
   useEffect(() => {
     const el = sectionRef.current;
-    if (!el) return;
+    if (!el) return undefined;
 
     const animateValue = (setter, from, to, duration, formatFn) => {
       const start = performance.now();
@@ -569,7 +665,6 @@ const StatsSection = () => {
     };
   }, []);
 
-  // Event listeners
   useEffect(() => {
     const handleGlobalMouseMove = (e) => handleMouseMove(e);
     const handleGlobalMouseUp = () => handleMouseUp();
@@ -591,31 +686,36 @@ const StatsSection = () => {
     };
   }, [isDragging, dragStart]);
 
-  // Smooth animation loop
   useEffect(() => {
     const animate = () => {
       const idle =
         Date.now() - lastInteractionRef.current > 2000 && !isDragging;
-      if (idle) rotationTargetRef.current += isMobile ? 0.25 : 0.1;
+      if (idle) {
+        rotationTargetRef.current += autoRotateStep;
+      }
       if (!isDragging) {
         rotationTargetRef.current += velocityRef.current;
-        velocityRef.current *= isMobile ? 0.92 : 0.9;
-        if (Math.abs(velocityRef.current) < 0.001) velocityRef.current = 0;
+        velocityRef.current *= velocityDamping;
+        if (Math.abs(velocityRef.current) < 0.001) {
+          velocityRef.current = 0;
+        }
       }
       setRotation(
-        (prev) =>
-          prev + (rotationTargetRef.current - prev) * (isMobile ? 0.22 : 0.15)
+        (prev) => prev + (rotationTargetRef.current - prev) * rotationSmoothing
       );
       rafRef.current = requestAnimationFrame(animate);
     };
     rafRef.current = requestAnimationFrame(animate);
-    return () => rafRef.current && cancelAnimationFrame(rafRef.current);
-  }, [isDragging, isMobile]);
+    return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, [isDragging, autoRotateStep, rotationSmoothing, velocityDamping]);
 
   return (
     <section ref={sectionRef} className="w-full bg-[#183942] py-12 lg:py-20">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header & description */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="h-px w-24 bg-[#ffffff7c] mx-auto mb-6" />
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold text-white leading-tight">
@@ -629,19 +729,18 @@ const StatsSection = () => {
           </p>
         </div>
 
-        {/* Responsive Bay Window Carousel */}
         <div className="mb-16 w-full flex justify-center">
           <div
-            className="relative"
+            className={`relative ${isMobile ? "" : "max-w-full"}`}
             style={{
-              perspective: isMobile ? "350px" : "2500px",
-              width: isMobile ? "100%" : "min(1000px, 95vw)",
-              height: isMobile ? "auto" : "min(600px, 65vh)",
-              aspectRatio: isMobile ? "16 / 9" : undefined,
+              perspective: carousel.perspective,
+              width: carousel.width,
+              height: carousel.height,
+              aspectRatio: carousel.aspectRatio,
               WebkitMaskImage: "none",
               maskImage: "none",
               overflow: "visible",
-              paddingBottom: isMobile ? undefined : "1.5rem",
+              paddingBottom: carousel.paddingBottom,
             }}
           >
             <div
@@ -654,20 +753,11 @@ const StatsSection = () => {
               onTouchStart={handleMouseDown}
             >
               {projectImages.map((image, index) => {
-                // Mobile configuration - much wider spacing to show one full image
-                const angleStep = isMobile ? 90 : 60;
                 const angle = index * -angleStep;
-                const z = isMobile ? -200 : -1000;
-                const originZ = isMobile ? 100 : 450;
-                const scale = isMobile ? 0.95 : 0.8;
-
-                // Mobile: Match container and keep rectangle
-                const mobileWidth = "100%";
-                const mobileHeight = "100%";
 
                 return (
                   <div
-                    key={index}
+                    key={image}
                     className={`absolute transition-opacity duration-300 ease-out ${
                       hoveredIndex !== null
                         ? hoveredIndex === index
@@ -677,16 +767,16 @@ const StatsSection = () => {
                     }`}
                     style={{
                       transformStyle: "preserve-3d",
-                      transform: `rotateY(${angle}deg) translateZ(${z}px) scale(${scale})`,
+                      transform: `rotateY(${angle}deg) translateZ(${translateZ}px) scale(${cardScale})`,
                       transformOrigin: `50% 50% ${originZ}px`,
                       backfaceVisibility: "hidden",
-                      width: mobileWidth,
-                      height: mobileHeight,
+                      width: "100%",
+                      height: "100%",
                       inset: "0",
                       backgroundColor: "transparent",
                       border: "none",
                       padding: "0",
-                      boxShadow: isMobile ? "none" : undefined,
+                      boxShadow: cardShadow,
                     }}
                     onMouseEnter={() => setHoveredIndex(index)}
                     onMouseLeave={() => setHoveredIndex(null)}
@@ -695,30 +785,25 @@ const StatsSection = () => {
                       className="relative h-full flex items-center justify-center py-4 md:py-8"
                       style={{
                         background: "transparent",
-                        minWidth: isMobile ? "100%" : "1020px",
+                        minWidth,
+                        margin: "0 auto",
                       }}
                     >
-                      {/* iMac Frame - Responsive sizing */}
                       <div
                         className="relative w-full mx-auto"
                         style={{
-                          maxWidth: isMobile ? "100%" : "650px",
-                          transform: isMobile ? "scale(0.85)" : "scale(1.1)",
+                          maxWidth: frame.maxWidth,
+                          transform: `scale(${frame.scale})`,
+                          transformOrigin: "center top",
                         }}
                       >
-                        {/* Screen */}
                         <div className="relative bg-[#2a2a2a] rounded-t-2xl md:rounded-t-3xl border-[6px] md:border-[10px] border-[#2a2a2a] shadow-[0_10px_40px_rgba(0,0,0,0.3)] md:shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
-                          {/* Top bezel light reflection */}
                           <div className="absolute top-0.5 md:top-1 left-1/4 right-1/4 h-[1px] md:h-[2px] bg-gradient-to-r from-transparent via-white/15 to-transparent rounded-full blur-sm" />
-
-                          {/* macOS Traffic Lights */}
                           <div className="absolute top-2 md:top-3 left-3 md:left-4 flex gap-1.5 md:gap-2 z-10">
                             <span className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#ff5f56] shadow-sm" />
                             <span className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#ffbd2e] shadow-sm" />
                             <span className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#27c93f] shadow-sm" />
                           </div>
-
-                          {/* Screen content - Full image display with contain */}
                           <div className="relative aspect-[16/10] bg-white overflow-hidden rounded-t-lg md:rounded-t-xl">
                             <img
                               src={image}
@@ -729,9 +814,7 @@ const StatsSection = () => {
                           </div>
                         </div>
 
-                        {/* Bottom chin - thinner and sleeker */}
                         <div className="relative h-8 md:h-10 bg-gradient-to-b from-[#e5e5e5] via-[#d8d8d8] to-[#c5c5c5] rounded-b-xl md:rounded-b-2xl flex items-center justify-center shadow-md md:shadow-lg">
-                          {/* Apple logo */}
                           <div className="w-3 h-3 md:w-4 md:h-4 flex items-center justify-center">
                             <svg
                               viewBox="0 0 24 24"
@@ -743,9 +826,7 @@ const StatsSection = () => {
                           </div>
                         </div>
 
-                        {/* Stand - more elegant */}
                         <div className="relative flex flex-col items-center">
-                          {/* Stand neck */}
                           <div
                             className="w-10 h-8 md:w-14 md:h-12 bg-gradient-to-b from-[#d5d5d5] to-[#c0c0c0] shadow-md"
                             style={{
@@ -753,11 +834,7 @@ const StatsSection = () => {
                                 "polygon(40% 0%, 60% 0%, 70% 100%, 30% 100%)",
                             }}
                           />
-
-                          {/* Stand base */}
                           <div className="w-28 h-2 md:w-36 md:h-2.5 bg-gradient-to-b from-[#e8e8e8] to-[#d0d0d0] rounded-full shadow-md md:shadow-lg -mt-0.5" />
-
-                          {/* Shadow */}
                           <div className="w-32 h-1 md:w-44 md:h-1.5 bg-black/8 blur-sm rounded-full mt-0.5" />
                         </div>
                       </div>
@@ -769,28 +846,23 @@ const StatsSection = () => {
           </div>
         </div>
 
-        {/* Stats area */}
         <div className="bg-transparent">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-start">
-            {/* Left: descriptive text */}
-            <div className="lg:col-span-2 order-1 lg:order-1">
+            <div className="lg:col-span-2 order-1 lg:order-1 text-center lg:text-left">
               <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-white leading-tight">
                 <span className="font-medium">Our</span>
                 <span className="font-semibold"> Impacts</span>
                 <span className="text-[#ef4b6e]">.</span>
               </h3>
-
               <p className="mt-6 text-sm sm:text-base md:text-lg text-white/90 leading-relaxed">
-                We are a digital agency,crafting Data-driven digital product
-                design &amp; technology firm that transforms business. Flexirl
-                focuses on human-centered UI/UX Design, UX Research, Web and
-                mobile app development — offering end-to-end services that your
-                users will love.
+                We are a digital agency, crafting data-driven digital product
+                design & technology that transforms business. Flexirl focuses on
+                human-centered UI/UX, research, and end-to-end development that
+                users love.
               </p>
             </div>
 
-            {/* Right: numeric stats */}
-            <div className="lg:col-span-3 order-2 lg:order-2 mt-6 lg:mt-0">
+            <div className="lg:col-span-3 order-2 lg:order-2 mt-8 lg:mt-0">
               <div className="grid grid-cols-2 gap-8 lg:gap-12">
                 <div className="flex flex-col items-start text-left">
                   <div className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[#b1eeff] leading-none">
