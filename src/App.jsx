@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import HeroSectionMobile from "./components/MobileComponents/HeroSectionMobile";
 import HeroSection from "./pages/Home/HeroSection";
 import useMediaQuery from "./hooks/useMediaQuery";
@@ -14,6 +14,7 @@ import ImagineHandSection from "./pages/Home/ImagineHandSection";
 import { StyledFixedNavigation } from "./components/common/FixedNavigation";
 import Hellosection from "./pages/Home/Hellosection";
 import Fixedribbon from "./components/Fixedribbon";
+import Loader from "./components/common/Loader";
 
 import { Helmet } from "react-helmet";
 import CtaWithTheme from "./components/ui/CtaWithTheme";
@@ -22,6 +23,7 @@ import ScrollText from "./components/ui/ScrollText";
 import FounderSection from "./pages/Home/FounderSection";
 
 function App() {
+  const [loading, setLoading] = useState(true);
   const [ctaOpen, setCtaOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
   const isDesktop = useMediaQuery("(min-width: 769px)");
@@ -29,79 +31,97 @@ function App() {
   const openCta = () => setCtaOpen(true);
   const closeCta = () => setCtaOpen(false);
 
+  // Prevent scrolling while loading
+  useEffect(() => {
+    if (loading) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [loading]);
+
   return (
     <>
-      <Helmet>
-        <title>
-          Creative Agency Services | Flexirl - Design & Digital Marketing
-          Experts
-        </title>
-        <meta
-          name="description"
-          content="Flexirl Creative Agency offers innovative design solutions, product development, digital marketing, and video motion graphics. Spark your brand's imaginative flair with our expert team of designers and developers."
-        />
-        <meta
-          property="og:title"
-          content="Creative Agency Services | Flexirl - Design & Digital Marketing Experts"
-        />
-        <meta
-          property="og:description"
-          content="Flexirl Creative Agency offers innovative design solutions, product development, digital marketing, and video motion graphics. Spark your brand's imaginative flair with our expert team of designers and developers."
-        />
-      </Helmet>
-      {isDesktop && <StyledFixedNavigation onOpenCta={openCta} />}
+      {loading && <Loader onLoadingComplete={() => setLoading(false)} />}
 
-      <main className="w-full overflow-x-hidden bg-[#ffff]">
-        <div className="overflow-x-hidden-">
-          {isMobile && <Header onOpenCta={openCta} />}
+      {!loading && (
+        <>
+          <Helmet>
+            <title>
+              Creative Agency Services | Flexirl - Design & Digital Marketing
+              Experts
+            </title>
+            <meta
+              name="description"
+              content="Flexirl Creative Agency offers innovative design solutions, product development, digital marketing, and video motion graphics. Spark your brand's imaginative flair with our expert team of designers and developers."
+            />
+            <meta
+              property="og:title"
+              content="Creative Agency Services | Flexirl - Design & Digital Marketing Experts"
+            />
+            <meta
+              property="og:description"
+              content="Flexirl Creative Agency offers innovative design solutions, product development, digital marketing, and video motion graphics. Spark your brand's imaginative flair with our expert team of designers and developers."
+            />
+          </Helmet>
+          {isDesktop && <StyledFixedNavigation onOpenCta={openCta} />}
 
-          {/* Home */}
-          <div id="home">
-            {isMobile ? (
-              <HeroSectionMobile onOpenCta={openCta} />
-            ) : (
-              <HeroSection onOpenCta={openCta} />
-            )}
-          </div>
+          <main className="w-full overflow-x-hidden bg-[#ffff]">
+            <div className="overflow-x-hidden-">
+              {isMobile && <Header onOpenCta={openCta} />}
 
-          {/* About - imagine hand + approach */}
-          <div id="about">
-            <ImagineHandSection onOpenCta={openCta} />
-            <ApproachSection />
-          </div>
+              {/* Home */}
+              <div id="home">
+                {isMobile ? (
+                  <HeroSectionMobile onOpenCta={openCta} />
+                ) : (
+                  <HeroSection onOpenCta={openCta} />
+                )}
+              </div>
 
-          {/* Services */}
-          <div id="services">
-            <ServicesSection />
-          </div>
+              {/* About - imagine hand + approach */}
+              <div id="about">
+                <ImagineHandSection onOpenCta={openCta} />
+                <ApproachSection />
+              </div>
 
-          <div>
-            <ScrollText />
-          </div>
+              {/* Services */}
+              <div id="services">
+                <ServicesSection />
+              </div>
 
-          {/* Projects - stats + best works */}
-          <div id="projects">
-            <BestWorksSection />
-            <StatsSection />
-          </div>
+              <div>
+                <ScrollText />
+              </div>
 
-          {/* Testimonials */}
-          <div id="testimonial">
-            <TestimonialsSection />
-          </div>
+              {/* Projects - stats + best works */}
+              <div id="projects">
+                <BestWorksSection />
+                <StatsSection />
+              </div>
 
-          <FAQSection />
-          <FounderSection />
-          <div id="sayhello">
-            <Hellosection onOpenCta={openCta} />
-          </div>
+              {/* Testimonials */}
+              <div id="testimonial">
+                <TestimonialsSection />
+              </div>
 
-          <Fixedribbon />
-          <Footer />
-        </div>
-      </main>
+              <FAQSection />
+              <FounderSection />
+              <div id="sayhello">
+                <Hellosection onOpenCta={openCta} />
+              </div>
 
-      <CtaWithTheme isOpen={ctaOpen} onClose={closeCta} />
+              <Fixedribbon />
+              <Footer />
+            </div>
+          </main>
+
+          <CtaWithTheme isOpen={ctaOpen} onClose={closeCta} />
+        </>
+      )}
     </>
   );
 }
